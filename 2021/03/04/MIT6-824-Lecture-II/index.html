@@ -187,7 +187,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      532 字
+      1.8k 字
     </span>
   
 
@@ -197,7 +197,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      5
+      19
        分钟
     </span>
   
@@ -242,8 +242,50 @@
 <li>构建一个不出现故障的网络（电脑内连接了CPU和内存的线路就是不可能出现故障的网络）</li>
 <li>人工解决问题（如果只有一个服务器响应，则提醒维护人员检查服务器是否关机了，还是网络问题）</li>
 </ul>
-<h3 id="过半票决（Majority-Vote）"><a href="#过半票决（Majority-Vote）" class="headerlink" title="过半票决（Majority Vote）"></a>过半票决（Majority Vote）</h3><p>服务器总数为奇数：如果系统有 2 * F + 1 个服务器，那么系统最多可以接受F个服务器出现故障，仍然可以正常工作。</p>
-
+<h3 id="过半票决（Majority-Vote）"><a href="#过半票决（Majority-Vote）" class="headerlink" title="过半票决（Majority Vote）"></a>过半票决（Majority Vote）</h3><p>当网络出现故障，将网络分割成两半，网络的两边独自运行，且不能访问对方，这通常被称为<strong>网络分区</strong>。</p>
+<p>服务器总数为奇数：如果系统有 2 * F + 1 个服务器，那么系统最多可以接受F个服务器出现故障，仍然可以正常工作。</p>
+<p>过半票决的一半指的是全部服务器数量的一半，而不是当前开机的服务器的数量的一半</p>
+<p>系统总是需要过半的服务器才能完成任何操作，任何操作需要过半的服务器进行批准，例如Raft Leader的选举，新Leader竞选成功必定有过半的服务器批准，而过半的服务器必定有一些（至少一个）服务器拥有旧Leader的任期号或提交的操作</p>
+<h3 id="Raft"><a href="#Raft" class="headerlink" title="Raft"></a>Raft</h3><p>Raft以库的形式存在于服务。一个基于Raft的多副本服务的每个副本由应用程序代码和Raft库构成。应用程序代码接受RPC或其他客户端请求，不同节点的Raft库相互协作，维护多副本之间的状态同步。</p>
+<p>对于Lab3来说，Raft节点上层应用是KV数据库，Raft层帮助应用程序将其状态（KV TABLE）拷贝到其他副本中，KV数据库通过调用Raft库函数，来传递自己的状态和Raft反馈的信息。Raft本身也会保存状态，最重要的就是Raft记录操作的日志。</p>
+<h5 id="工作流程："><a href="#工作流程：" class="headerlink" title="工作流程："></a>工作流程：</h5><ul>
+<li>客户端发送请求至Raft集群中的Leader节点（如Put、Get）</li>
+<li>Leader节点的应用程序将操作发送到它的Raft层，让Raft把操作提交到多副本的日志中，并在完成时通知它</li>
+<li>Raft节点之间相互交互，直到过半的节点将这个新操作加入到它们的日志中</li>
+<li>当Raft的Leader节点知道过半的节点已完成日志更新，则会告知应用程序已经提交副本，可以开始它的操作，KV数据库开始它的操作</li>
+<li>当请求被提交到客户端后，Leader告诉其它节点他们的响应已经被提交</li>
+</ul>
+<h5 id="Raft日志"><a href="#Raft日志" class="headerlink" title="Raft日志"></a>Raft日志</h5><p>Raft Log的作用：</p>
+<ul>
+<li>Log是Leader用来对操作排序的一种手段。对于复制状态机，所有副本不仅要执行相同的操作，还要以相同的顺序执行这些操作</li>
+<li>对于Raft的Follower来说，Log是用来存放临时操作的地方。当Follower收到来自leader的新的commit号后才执行操作</li>
+<li>Leader需要在它的Log中记录操作，因为这些操作可能需要重传给Follower（网络问题或者宕机）</li>
+<li>持久化存储，帮助重启的服务器恢复状态。你可能的确需要一个故障了的服务器在修复后，能重新加入到Raft集群</li>
+</ul>
+<h5 id="应用层接口"><a href="#应用层接口" class="headerlink" title="应用层接口"></a>应用层接口</h5><p>应用层和Raft层之间的接口<br>两个接口：</p>
+<ul>
+<li>应用层转发客户端请求的接口（key-value层说：我接到了这个请求，请把它存在Log中，并在committed之后告诉我。）</li>
+<li>Raft Leader完成提交后通知应用层的接口（你刚刚在Start函数中传给我的请求已经commit了）（请求和请求在Log的位置）</li>
+</ul>
+<h4 id="Leader选举"><a href="#Leader选举" class="headerlink" title="Leader选举"></a>Leader选举</h4><p>Paxos系统没有Leader：通过一组服务器来共同认可Log的顺序，进而构成一致性系统</p>
+<p>Raft有Leader的原因：若服务器不出现故障，Leader的存在使得系统更加高效（无Leader系统需要先进行一轮信息交互确定一个临时Leader）</p>
+<p>使用任期号（term number）来区分不同的Leader</p>
+<p>Leader的创建：每个Raft节点有一个选举定时器，如果在定时器结束之前没有收到Leader的消息，则认为Leader已经下线并开始选举；当定时器时间耗尽，会开始一轮选举，当前服务器会增加任期号，并发起请求投票RPC，发给所有的Raft节点。（若有过半的服务器故障了，或者网络分区内的服务器不过半，则选不出Leader）<br>当服务器收到过半服务器认可投票后，该服务器直接知道自己成了Leader，但其他服务器需要收到新Leader发送的特定任期号的AppendEntries后才会知道选举成功。AppendEntries会重启服务器的选举定时器</p>
+<p>选举失败的情况</p>
+<ul>
+<li><p>过半的服务器故障或者网络分区内没有过半的服务器</p>
+</li>
+<li><p>所有的服务器选举定时器同时耗尽时间，同时发起选举，分割了选票（解决：随即选举定时器的超时时间，选举定时器的超时时间需要至少大于Leader的心跳间隔）</p>
+<p>选举定时器超时时间的设定</p>
+</li>
+<li><p>选举定时器的超时时间需要至少大于Leader的心跳间隔</p>
+</li>
+<li><p>选举定时器的超时时间越长，系统集群瘫痪的恢复时间也就越长</p>
+</li>
+<li><p>不同节点的选举定时器的超时时间差至少需要大于发送一条RPC所需要的往返（Round-Trip）时间。使得第一个开始选举的节点能够完成选举。</p>
+</li>
+</ul>
+<h2 id="Lecture-07-Raft2"><a href="#Lecture-07-Raft2" class="headerlink" title="Lecture 07 Raft2"></a>Lecture 07 Raft2</h2>
             </div>
             <hr>
             <div>
