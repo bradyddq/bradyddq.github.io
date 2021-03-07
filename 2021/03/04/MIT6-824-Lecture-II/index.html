@@ -187,7 +187,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      3.6k 字
+      4k 字
     </span>
   
 
@@ -197,7 +197,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      38
+      42
        分钟
     </span>
   
@@ -336,7 +336,21 @@
 <h3 id="线性一致（Linearizability）"><a href="#线性一致（Linearizability）" class="headerlink" title="线性一致（Linearizability）"></a>线性一致（Linearizability）</h3><p>线性一致（Linearizability）即强一致（Strong consistency）</p>
 <p>一个系统的执行历史是一系列的客户端请求，或许这是来自多个客户端的多个请求。如果执行历史整体可以按照一个顺序排列，且排列顺序与客户端请求的实际时间相符合，那么它是<strong>线性一致</strong>的。<br>当一个客户端发出一个请求，得到一个响应，之后另一个客户端发出了一个请求，也得到了响应，那么这两个请求之间是<strong>有顺序的</strong>，因为一个在另一个完成之后才开始。<br>一个线性一致的执行历史中的操作是非并发的，也就是时间上不重合的客户端请求与实际执行时间匹配。并且，每一个读操作都看到的是最近一次写入的值。</p>
 <p>课程举了若干个例子来解释什么是线性一致的，在例子中，<strong>不是线性一致的就是，可以构造一个带环的图</strong></p>
-<h2 id="Lecture-08-Zookeeper"><a href="#Lecture-08-Zookeeper" class="headerlink" title="Lecture 08 Zookeeper"></a>Lecture 08 Zookeeper</h2><h3 id="Zookeeper"><a href="#Zookeeper" class="headerlink" title="Zookeeper"></a>Zookeeper</h3><h3 id="一致性保证-Consistency-Guarantees"><a href="#一致性保证-Consistency-Guarantees" class="headerlink" title="一致性保证 Consistency Guarantees"></a>一致性保证 Consistency Guarantees</h3><h3 id="同步操作-Sync"><a href="#同步操作-Sync" class="headerlink" title="同步操作 Sync"></a>同步操作 Sync</h3><h3 id="就绪文件-Ready-File-Znode"><a href="#就绪文件-Ready-File-Znode" class="headerlink" title="就绪文件 Ready File/Znode"></a>就绪文件 Ready File/Znode</h3>
+<h2 id="Lecture-08-Zookeeper"><a href="#Lecture-08-Zookeeper" class="headerlink" title="Lecture 08 Zookeeper"></a>Lecture 08 Zookeeper</h2><h3 id="Zookeeper"><a href="#Zookeeper" class="headerlink" title="Zookeeper"></a>Zookeeper</h3><p>Raft是一个库，可以在一个多副本系统中使用Raft，但Raft不是一个可以直接交互的服务。</p>
+<p>Zookeeper可以被称为通用的协调服务，运行在Zab之上（Zab类似于Raft）。</p>
+<p>一般来说，为了容错，增加了大量的服务器，但是更多的服务器使得系统更慢了，因为Leader需要做的工作更多了。</p>
+<p>但是Zookeeper实现了随着服务器增加，系统读性能的提升。Zookeeper允许客户端将读请求发送给任意副本，并由副本根据自己的状态来响应读请求。</p>
+<p>Zookeeper不为读请求提供最新的数据，不支持线性一致,是解决了性能和强一致性矛盾的方法。</p>
+<h5 id="一致性保证-Consistency-Guarantees"><a href="#一致性保证-Consistency-Guarantees" class="headerlink" title="一致性保证 Consistency Guarantees"></a>一致性保证 Consistency Guarantees</h5><p>Zookeeper的两个保证:</p>
+<ul>
+<li>写请求是线性一致的(写请求按客户端的请求顺序执行)</li>
+<li>任何一个客户端的请求，都会按照客户端指定的顺序来执行，论文里称之为FIFO（First In First Out）客户端序列。</li>
+</ul>
+<p>对于读请求，第二个读请求只允许在第一个读请求的位置或之后的位置执行,不能在其之前执行.</p>
+<h5 id="同步操作-Sync"><a href="#同步操作-Sync" class="headerlink" title="同步操作 Sync"></a>同步操作 Sync</h5><p>如果需要获取最新的数据,可以发送一个Sync请求,再发送一个读请求,但这个请求代价很高</p>
+<pre><code>感觉后面的课程总结没什么意思,让我们了解各种分布式系统是怎么设计的
+</code></pre>
+<h5 id="就绪文件-Ready-File-Znode"><a href="#就绪文件-Ready-File-Znode" class="headerlink" title="就绪文件 Ready File/Znode"></a>就绪文件 Ready File/Znode</h5><h5 id="Zookeeper-API"><a href="#Zookeeper-API" class="headerlink" title="Zookeeper API"></a>Zookeeper API</h5><h5 id="使用Zookeeper实现计数器"><a href="#使用Zookeeper实现计数器" class="headerlink" title="使用Zookeeper实现计数器"></a>使用Zookeeper实现计数器</h5><h5 id="使用Zookeeper实现非扩展锁"><a href="#使用Zookeeper实现非扩展锁" class="headerlink" title="使用Zookeeper实现非扩展锁"></a>使用Zookeeper实现非扩展锁</h5><h5 id="使用Zookeeper实现可扩展锁"><a href="#使用Zookeeper实现可扩展锁" class="headerlink" title="使用Zookeeper实现可扩展锁"></a>使用Zookeeper实现可扩展锁</h5>
             </div>
             <hr>
             <div>
