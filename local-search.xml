@@ -4,17 +4,40 @@
   
   
   <entry>
-    <title>Lettcode三月</title>
-    <link href="/2021/03/10/leetcode202103/"/>
-    <url>/2021/03/10/leetcode202103/</url>
+    <title>并查集</title>
+    <link href="/2021/03/10/%E5%B9%B6%E6%9F%A5%E9%9B%86/"/>
+    <url>/2021/03/10/%E5%B9%B6%E6%9F%A5%E9%9B%86/</url>
     
-    <content type="html"><![CDATA[<h2 id="2021-03-10"><a href="#2021-03-10" class="headerlink" title="2021-03-10"></a>2021-03-10</h2><h3 id="基本计算器"><a href="#基本计算器" class="headerlink" title="基本计算器"></a>基本计算器</h3><p>思路：遍历每个字符，跳过空格；用一个整型值和一个栈来辅助存储正负，遇到加号不管，遇到减号取负，遇到左括号压栈；遇到数字则循环计算数字值并加入到结果。</p><p>问题：力扣上该题没有任何异常数据，官方题解没有异常处理，而在这种题显然会出现各种异常情况，需要考虑哪些异常情况？</p>]]></content>
+    <content type="html"><![CDATA[<h2 id="并查集"><a href="#并查集" class="headerlink" title="并查集"></a>并查集</h2>]]></content>
     
     
     
     <tags>
       
       <tag>Lettcode</tag>
+      
+      <tag>并查集</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Lettcode三月</title>
+    <link href="/2021/03/10/leetcode202103/"/>
+    <url>/2021/03/10/leetcode202103/</url>
+    
+    <content type="html"><![CDATA[<h2 id="2021-03-10"><a href="#2021-03-10" class="headerlink" title="2021-03-10"></a>2021-03-10</h2><h3 id="每日一题：基本计算器"><a href="#每日一题：基本计算器" class="headerlink" title="每日一题：基本计算器"></a>每日一题：基本计算器</h3><h4 id="基本计算器（只有加减和括号）"><a href="#基本计算器（只有加减和括号）" class="headerlink" title="基本计算器（只有加减和括号）"></a>基本计算器（只有加减和括号）</h4><p>思路：遍历每个字符，跳过空格；用一个整型值和一个栈来辅助存储正负，遇到加号不管，遇到减号取负，遇到左括号压栈；遇到数字则循环计算数字值并加入到结果。</p><h4 id="基本计算器II（只有加减乘除没有括号）"><a href="#基本计算器II（只有加减乘除没有括号）" class="headerlink" title="基本计算器II（只有加减乘除没有括号）"></a>基本计算器II（只有加减乘除没有括号）</h4><p>思路：遍历每个字符，跳过空格；两个栈一个存数字，一个存符号，原理是每次遇到乘除法就优先计算并将结果压回，如果遇到减号就当成加一个负数。</p><pre><code>高赞回答是将表达式转化为后缀表达式，比如由“3+2*2”利用栈转化为“3 2 2 * +”，再将数字压栈，运算符则顺序，最终得到答案</code></pre><p>可参考  <a href="https://leetcode-cn.com/problems/evaluate-reverse-polish-notation/">Lettcode150 逆波兰表达式求值</a></p><h4 id="基本计算器III（会员题，加减乘除和括号）"><a href="#基本计算器III（会员题，加减乘除和括号）" class="headerlink" title="基本计算器III（会员题，加减乘除和括号）"></a>基本计算器III（会员题，加减乘除和括号）</h4><p>问题：本科面向对象课程上做的计算器用树来存各种运算符和数字，并考虑大量异常处理。力扣上该题没有任何异常数据，官方题解没有异常处理，而在这种题显然会出现各种异常情况，需要考虑哪些异常情况？</p><h2 id="2021-03-11"><a href="#2021-03-11" class="headerlink" title="2021-03-11"></a>2021-03-11</h2><h3 id="每日一题：基本计算器II"><a href="#每日一题：基本计算器II" class="headerlink" title="每日一题：基本计算器II"></a>每日一题：基本计算器II</h3><h2 id="2021-03-12"><a href="#2021-03-12" class="headerlink" title="2021-03-12"></a>2021-03-12</h2>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>Lettcode</tag>
+      
+      <tag>每日一题</tag>
       
     </tags>
     
@@ -27,7 +50,7 @@
     <link href="/2021/03/08/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E5%88%86%E7%B1%BB/"/>
     <url>/2021/03/08/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E5%88%86%E7%B1%BB/</url>
     
-    <content type="html"><![CDATA[<h2 id="线性动态规划"><a href="#线性动态规划" class="headerlink" title="线性动态规划"></a>线性动态规划</h2><p>线性动态规划，是较常见的一类动态规划问题，其是在线性结构上进行状态转移，这类问题不像<strong>背包问题</strong>、<strong>区间DP</strong>等有固定的模板。<br>线性动态规划的目标函数为特定变量的线性函数，约束是这些变量的线性不等式或等式，目的是求目标函数的最大值或最小值。<br>因此，除了少量问题（如：LIS、LCS、LCIS等）有固定的模板外，大部分都要根据实际问题来推导得出答案。</p><pre><code>出处：https://blog.csdn.net/u011815404/article/details/81870275</code></pre>]]></content>
+    <content type="html"><![CDATA[<h2 id="动态规划"><a href="#动态规划" class="headerlink" title="动态规划"></a>动态规划</h2><p>动态规划分类：<a href="https://zhuanlan.zhihu.com/p/126546914">https://zhuanlan.zhihu.com/p/126546914</a></p><h2 id="线性动态规划"><a href="#线性动态规划" class="headerlink" title="线性动态规划"></a>线性动态规划</h2><p>线性动态规划，是较常见的一类动态规划问题，其是在线性结构上进行状态转移，这类问题不像<strong>背包问题</strong>、<strong>区间DP</strong>等有固定的模板。<br>线性动态规划的目标函数为特定变量的线性函数，约束是这些变量的线性不等式或等式，目的是求目标函数的最大值或最小值。<br>因此，除了少量问题（如：LIS、LCS、LCIS等）有固定的模板外，大部分都要根据实际问题来推导得出答案。<br><a href="https://blog.csdn.net/u011815404/article/details/81870275">上述转自CSDN博客：Alex_McAvoy</a></p><p><strong>经典问题</strong></p><p><strong>最长公共子序列</strong>（最经典双串）和<strong>最大子序和</strong>是算法导论上的经典例子</p><p>120 三角形最小路径和：根据题目写出状态方程基本完成，题解中还提到了对空间的优化</p><p>300 最长上升子序列LIS (最经典单串)</p><p>152 乘积最大子数组：类似最大子序和，但状态转移方程没子序和那么简单，需要存一个最大乘积和一个最小乘积</p><p>887 鸡蛋掉落 (DP+二分)</p><p>354 俄罗斯套娃信封问题 (隐晦的LIS)</p><p><strong>打家劫舍系列</strong><br>198 打家劫舍：与最大子序和类似，但不能选相邻的两个数字</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">dp[i] = max(dp[i<span class="hljs-number">-2</span>]+nums[i],dp[i<span class="hljs-number">-1</span>])<br></code></pre></td></tr></table></figure><p>213 打家劫舍 II ：与打家劫舍相比，首尾是相邻的，只需要分两种情况（选第一个就不能选最后一个，选最后一个就不能选第一个）按打家劫舍1的方法去做就行,最后取两值较大的一个。</p>]]></content>
     
     
     
